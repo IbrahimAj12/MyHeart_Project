@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+
+  mongodb:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+
+  patient:
+    build: ./Patient
+    ports:
+      - "8000:8000"
+
+  rendezvous:
+    build: ./Rendezvous
+    ports:
+      - "8001:8001"
+    depends_on:
+      - patient
+      - facturation
+
+  facturation:
+    build: ./Facturation
+    ports:
+      - "8002:8002"
+
+  resultats:
+    build: ./Resultats
+    ports:
+      - "8003:8003"
+    depends_on:
+      - mongodb
+
+  dossiersmed:
+    build: ./DossiersMed
+    ports:
+      - "8004:8004"
+    depends_on:
+      - mongodb
+
+  prescriptions:
+    build: ./Prescriptions
+    ports:
+      - "8005:8005"
+    depends_on:
+      - dossiersmed
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - patient
+      - rendezvous

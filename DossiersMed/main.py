@@ -7,7 +7,7 @@ app = FastAPI(title="Microservice Dossiers Médicaux")
 PORT = 8004 # On utilise le port 8004 pour ne pas faire de conflit
 
 # Connexion au même serveur MongoDB, mais sur une base de données différente !
-client = AsyncIOMotorClient("mongodb://localhost:27017")
+client = AsyncIOMotorClient("mongodb://mongodb:27017")
 db = client.dossiers_db 
 collection = db.dossiers
 

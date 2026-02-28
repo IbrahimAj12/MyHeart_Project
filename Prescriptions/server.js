@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const app = express();
 app.use(express.json());
-const PORT = 8005; 
+const PORT = 8005;
 
 // Initialisation de la base de données relationnelle locale
 const db = new sqlite3.Database('./prescriptions.db', (err) => {
@@ -25,13 +25,13 @@ app.post('/prescriptions/', async (req, res) => {
 
     try {
         // 1. VÉRIFICATION DE SÉCURITÉ : Interrogation du microservice DossiersMed (Port 8004)
-        const dossierResponse = await axios.get(`http://127.0.0.1:8004/dossiers/${patient_id}`);
+        const dossierResponse = await axios.get(`http://dossiersmed:8004/dossiers/${patient_id}`);
         const allergies = dossierResponse.data.allergies || [];
 
         // 2. LOGIQUE MÉTIER : Le patient est-il allergique ?
         if (allergies.includes(medicament)) {
             console.log(`[ALERTE] Tentative de prescription bloquée pour le patient ${patient_id}`);
-            return res.status(400).json({ 
+            return res.status(400).json({
                 alerte_critique: "DANGER ! Le patient est allergique à ce médicament.",
                 medicament_bloque: medicament
             });
@@ -39,13 +39,13 @@ app.post('/prescriptions/', async (req, res) => {
 
         // 3. VALIDATION : Si aucune allergie, on enregistre la prescription
         const sql = 'INSERT INTO prescriptions (patient_id, medecin_nom, medicament, posologie) VALUES (?, ?, ?, ?)';
-        db.run(sql, [patient_id, medecin_nom, medicament, posologie], function(err) {
+        db.run(sql, [patient_id, medecin_nom, medicament, posologie], function (err) {
             if (err) return res.status(500).json({ error: err.message });
-            
+
             console.log(`Prescription de ${medicament} validée.`);
-            res.status(201).json({ 
-                message: "Prescription créée avec succès", 
-                prescription_id: this.lastID 
+            res.status(201).json({
+                message: "Prescription créée avec succès",
+                prescription_id: this.lastID
             });
         });
 

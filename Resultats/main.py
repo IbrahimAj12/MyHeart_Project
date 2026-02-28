@@ -7,7 +7,7 @@ app = FastAPI(title="Microservice Resultats (Laboratoire)")
 PORT = 8003
 
 # Connexion à MongoDB (On supposera qu'il tourne en local sur le port par défaut 27017)
-client = AsyncIOMotorClient("mongodb://localhost:27017")
+client = AsyncIOMotorClient("mongodb://mongodb:27017")
 db = client.laboratoire_db # Créera la base automatiquement
 collection = db.resultats  # Créera la collection automatiquement
 

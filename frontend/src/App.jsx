@@ -9,10 +9,21 @@ function App() {
 
   const creerPatient = async (e) => {
     e.preventDefault();
+
+    // On crée une copie du patient et on lui donne un email unique aléatoire
+    const patientPourEnvoi = {
+      ...patient,
+      prenom: patient.prenom || 'Inconnu',
+      email: `patient_${Math.floor(Math.random() * 10000)}@hopital.com`,
+      telephone: patient.telephone || '00000000'
+    };
+
     try {
-      const res = await axios.post('/api/patients/', patient);
-      setPatientMsg(`✅ Patient créé ! ID: ${res.data.id}`);
-    } catch (err) { setPatientMsg('❌ Erreur création patient'); }
+      const res = await axios.post('/api/patients/', patientPourEnvoi);
+      setPatientMsg('✅ Patient créé avec succès dans la base de données !');
+    } catch (err) {
+      setPatientMsg('❌ Erreur création patient');
+    }
   }
 
   const prendreRdv = async (e) => {

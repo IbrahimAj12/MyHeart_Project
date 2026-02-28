@@ -18,3 +18,16 @@ npm-debug.log*
 
 # OS
 .DS_Store
+
+# Postman
+postman/
+
+# Screenshots
+ss/
+
+
+# Frontend (React/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/npm-debug.log*

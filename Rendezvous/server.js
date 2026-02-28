@@ -18,22 +18,34 @@ db.run(`CREATE TABLE IF NOT EXISTS rendezvous (
     date_heure TEXT
 )`);
 
+// 2. Route pour créer un rendez-vous (La communication inter-services)
 app.post('/rendezvous/', async (req, res) => {
     const { patient_id, medecin_nom, date_heure } = req.body;
 
     try {
-        // ÉTAPE CLÉ : Vérifier si le patient existe en interrogeant le microservice Patient (Port 8000)
-        const patientResponse = await axios.get(`http://127.0.0.1:8000/patients/${patient_id}`);
-        
+        const patientResponse = await axios.get(`http://patient:8000/patients/${patient_id}`);
+
         if (patientResponse.status === 200) {
+
             const sql = 'INSERT INTO rendezvous (patient_id, medecin_nom, date_heure) VALUES (?, ?, ?)';
-            db.run(sql, [patient_id, medecin_nom, date_heure], function(err) {
+
+            db.run(sql, [patient_id, medecin_nom, date_heure], async function (err) {
                 if (err) return res.status(500).json({ error: err.message });
-                
-                res.status(201).json({ 
-                    message: "Rendez-vous confirmé", 
-                    id: this.lastID,
-                    patient_info: patientResponse.data 
+
+                try {
+                    await axios.post('http://factures:8002/factures/', {
+                        patient_id: patient_id,
+                        montant: 300.0 // Montant par défaut d'une consultation
+                    });
+                    console.log("Facture générée automatiquement via le service Facturation.");
+                } catch (fErr) {
+                    console.error("Erreur lors de la génération de la facture:", fErr.message);
+                }
+
+                res.status(201).json({
+                    message: "Rendez-vous et Facture créés avec succès !",
+                    rendezvous_id: this.lastID,
+                    patient_info: patientResponse.data
                 });
             });
         }
